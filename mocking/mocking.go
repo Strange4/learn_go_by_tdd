@@ -16,6 +16,15 @@ func (d *DefaultSleeper) Sleep() {
 	time.Sleep(1 * time.Second)
 }
 
+type ConfigurableSleeper struct {
+	Duration  time.Duration
+	SleepFunc func(time.Duration)
+}
+
+func (c *ConfigurableSleeper) Sleep() {
+	c.SleepFunc(c.Duration)
+}
+
 const finalWord = "Go!"
 const countDownStart = 3
 
