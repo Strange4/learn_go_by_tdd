@@ -99,6 +99,13 @@ func TestWalk(t *testing.T) {
 			},
 			[]string{"Coffee", "Cow", "La Vaca", "Moo"},
 		},
+		{
+			"with channel",
+			makeChannelWithInfo([]Info{
+				{33, "Young blood"}, {44, "Old blood"},
+			}),
+			[]string{"Young blood", "Old blood"},
+		},
 	}
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -142,4 +149,17 @@ func arraysAreEqualWithoutOrder(t *testing.T, want, got []string) {
 			t.Fatalf("item %q appeared more times than wanted", key)
 		}
 	}
+}
+
+func makeChannelWithInfo(info []Info) chan Info {
+	channel := make(chan Info)
+
+	go func() {
+		for _, item := range info {
+			channel <- item
+		}
+		close(channel)
+	}()
+
+	return channel
 }
