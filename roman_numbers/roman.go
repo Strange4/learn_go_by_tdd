@@ -12,7 +12,7 @@ var allRomanNumerals = []RomanNumeral{
 	{500, "D"},
 	{400, "CD"},
 	{100, "C"},
-	{90, "CX"},
+	{90, "XC"},
 	{50, "L"},
 	{40, "XL"},
 	{10, "X"},
@@ -31,4 +31,8 @@ func DecToRoman(number int) string {
 		}
 	}
 	return result
+}
+
+func RomanToDec(roman string) int {
+	return 0
 }

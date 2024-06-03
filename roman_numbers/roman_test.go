@@ -1,36 +1,64 @@
 package roman
 
 import (
+	"fmt"
 	"hello/assertions"
 	"testing"
 )
 
+var testCases = []struct {
+	decimal int
+	roman   string
+}{
+	{1, "I"},
+	{2, "II"},
+	{3, "III"},
+	{4, "IV"},
+	{5, "V"},
+	{6, "VI"},
+	{7, "VII"},
+	{8, "VIII"},
+	{9, "IX"},
+	{10, "X"},
+	{14, "XIV"},
+	{18, "XVIII"},
+	{20, "XX"},
+	{39, "XXXIX"},
+	{40, "XL"},
+	{47, "XLVII"},
+	{49, "XLIX"},
+	{50, "L"},
+	{100, "C"},
+	{90, "XC"},
+	{400, "CD"},
+	{500, "D"},
+	{900, "CM"},
+	{1000, "M"},
+	{1984, "MCMLXXXIV"},
+	{3999, "MMMCMXCIX"},
+	{2014, "MMXIV"},
+	{1006, "MVI"},
+	{798, "DCCXCVIII"},
+}
+
 func TestDecToRoman(t *testing.T) {
-	testCases := []struct {
-		name          string
-		decimal       int
-		expectedRoman string
-	}{
-		{"1 converts to I", 1, "I"},
-		{"2 converts to II", 2, "II"},
-		{"3 converts to III", 3, "III"},
-		{"4 converts to IV", 4, "IV"},
-		{"9 converts to IX", 9, "IX"},
-		{"10 gets converted to X", 10, "X"},
-		{"14 gets converted to XIV", 14, "XIV"},
-		{"18 gets converted to XVIII", 18, "XVIII"},
-		{"20 gets converted to XX", 20, "XX"},
-		{"39 gets converted to XXXIX", 39, "XXXIX"},
-		{"40 gets converted to XL", 40, "XL"},
-		{"47 gets converted to XLVII", 47, "XLVII"},
-		{"49 gets converted to XLIX", 49, "XLIX"},
-		{"50 gets converted to L", 50, "L"},
-	}
 	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
+		name := fmt.Sprintf("%d converts to %q", testCase.decimal, testCase.roman)
+		t.Run(name, func(t *testing.T) {
 			got := DecToRoman(testCase.decimal)
-			want := testCase.expectedRoman
+			want := testCase.roman
 			assertions.AssertString(t, got, want)
+		})
+	}
+}
+
+func TestRomanToDec(t *testing.T) {
+	for _, testCase := range testCases {
+		name := fmt.Sprintf("%q converts to %d", testCase.roman, testCase.decimal)
+		t.Run(name, func(t *testing.T) {
+			got := RomanToDec(testCase.roman)
+			want := testCase.decimal
+			assertions.AssertInteger(t, got, want)
 		})
 	}
 }
