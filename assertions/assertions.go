@@ -22,7 +22,7 @@ func AssertInteger(t *testing.T, got int, want int) {
 func AssertEqual(t *testing.T, got, want any) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("Got %v, want %v", got, want)
+		t.Fatalf("Got %+v, want %+v", got, want)
 	}
 }
 
