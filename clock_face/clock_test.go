@@ -39,6 +39,49 @@ func TestSecondHand(t *testing.T) {
 	}
 }
 
+func TestMinuteHand(t *testing.T) {
+	center := Point{150, 150}
+	radius := 150.0
+	minuteHandLength := radius * 0.5
+
+	cases := []struct {
+		name  string
+		time  time.Time
+		point Point
+	}{
+		{
+			"0 minutes",
+			simpleTime(0, 0, 0),
+			Point{X: center.X, Y: center.Y - minuteHandLength},
+		},
+		{
+			"15 minutes",
+			simpleTime(0, 15, 0),
+			Point{X: center.X + minuteHandLength, Y: center.Y},
+		},
+		{
+			"30 minutes",
+			simpleTime(0, 30, 0),
+			Point{X: center.X, Y: center.Y + minuteHandLength},
+		},
+		{
+			"45 minutes",
+			simpleTime(0, 45, 0),
+			Point{X: center.X - minuteHandLength, Y: center.Y},
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := Clock{testCase.time, center, radius}
+			want := testCase.point
+			got := c.MinuteHand()
+			if !pointsRoughlyEqual(want, got) {
+				t.Errorf("Wanted point %v but got %v", want, got)
+			}
+		})
+	}
+}
+
 func pointsRoughlyEqual(a, b Point) bool {
 	return floatRoughlyEqual(a.X, b.X) && floatRoughlyEqual(a.Y, b.Y)
 }

@@ -8,13 +8,12 @@ import (
 func SVGWriter(writer io.Writer, clock *Clock) {
 	secondHand := clock.SecondHand()
 
-	seconds := fmt.Sprintf(`
+	writer.Write([]byte(svgStart))
+	fmt.Fprintf(writer, `
 	<!-- second hand -->
 	<line id="second_hand" x1="150" y1="150" x2="%.3f" y2="%.3f"
-		  style="fill:none;stroke:#f00;stroke-width:3px;"/>`, secondHand.X, secondHand.Y)
-
-	writer.Write([]byte(svgStart))
-	writer.Write([]byte(seconds))
+		  style="fill:none;stroke:#f00;stroke-width:3px;"/>
+		  `, secondHand.X, secondHand.Y)
 	writer.Write([]byte(svgEnd))
 }
 

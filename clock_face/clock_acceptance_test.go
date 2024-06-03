@@ -1,9 +1,8 @@
-package clock_face_test
+package clock_face
 
 import (
 	"bytes"
 	"encoding/xml"
-	"hello/clock_face"
 	"testing"
 	"time"
 )
@@ -16,45 +15,63 @@ type SVG struct {
 	Height  string   `xml:"height,attr"`
 	ViewBox string   `xml:"viewBox,attr"`
 	Version string   `xml:"version,attr"`
-	Circle  struct {
-		Text  string `xml:",chardata"`
-		ID    string `xml:"id,attr"`
-		Cx    string `xml:"cx,attr"`
-		Cy    string `xml:"cy,attr"`
-		R     string `xml:"r,attr"`
-		Style string `xml:"style,attr"`
-	} `xml:"circle"`
-	Line []struct {
-		Text  string `xml:",chardata"`
-		ID    string `xml:"id,attr"`
-		X1    string `xml:"x1,attr"`
-		Y1    string `xml:"y1,attr"`
-		X2    string `xml:"x2,attr"`
-		Y2    string `xml:"y2,attr"`
-		Style string `xml:"style,attr"`
-	} `xml:"line"`
+	Circle  Circle   `xml:"circle"`
+	Line    []Line   `xml:"line"`
 }
 
-func TestSVGWriteerAtMidnight(t *testing.T) {
-	time := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
-	c := clock_face.Clock{time, clock_face.Point{150, 150}, 150}
-	writer := bytes.Buffer{}
-	clock_face.SVGWriter(&writer, &c)
-	svg := SVG{}
+type Circle struct {
+	ID string  `xml:"id,attr"`
+	Cx float64 `xml:"cx,attr"`
+	Cy float64 `xml:"cy,attr"`
+	R  float64 `xml:"r,attr"`
+}
 
-	xml.Unmarshal(writer.Bytes(), &svg)
+type Line struct {
+	ID string  `xml:"id,attr"`
+	X1 float64 `xml:"x1,attr"`
+	Y1 float64 `xml:"y1,attr"`
+	X2 float64 `xml:"x2,attr"`
+	Y2 float64 `xml:"y2,attr"`
+}
 
-	wantX := "150.000"
-	wantY := "60.000"
+func TestSVGWriterSecondHand(t *testing.T) {
 
-	for _, line := range svg.Line {
-		if line.ID == "second_hand" {
-			if line.X2 == "150.000" && line.Y2 == "60.000" {
-				return
-			} else {
-				t.Fatalf("Wanted point {%s, %s} but got {%s, %s}", wantX, wantY, line.X2, line.Y2)
+	cases := []struct {
+		name string
+		time time.Time
+		line Line
+	}{
+		{
+			"0 seconds",
+			simpleTime(0, 0, 0),
+			Line{"second_hand", 150, 150, 150, 60},
+		},
+		{
+			"30 seconds",
+			simpleTime(0, 0, 30),
+			Line{"second_hand", 150, 150, 150, 240},
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := Clock{testCase.time, Point{150, 150}, 150}
+			buffer := bytes.Buffer{}
+			want := testCase.line
+			SVGWriter(&buffer, &c)
+			svg := SVG{}
+			xml.Unmarshal(buffer.Bytes(), &svg)
+			if !containsLine(want, svg.Line) {
+				t.Errorf("Expected the line %v to be present in the svg but was not. Lines: %v", want, svg.Line)
 			}
+		})
+	}
+}
+
+func containsLine(l Line, lines []Line) bool {
+	for _, line := range lines {
+		if line == l {
+			return true
 		}
 	}
-
+	return false
 }
