@@ -15,23 +15,32 @@ type Clock struct {
 }
 
 func (c *Clock) SecondHand() Point {
-	// secondHandLength := c.Radius * 0.6
-	return angleToUnitPoint(secondsInRadians(c.Time.Second()))
+	return angleToUnitPoint(secondsInRadians(c.Time))
 }
 
 func (c *Clock) MinuteHand() Point {
-	// minuteHandLength := c.Radius * 0.5
-	return angleToUnitPoint(minutesInRadians(c.Time.Minute()))
-
+	return angleToUnitPoint(minutesInRadians(c.Time))
 }
 
-func secondsInRadians(seconds int) (rads float64) {
+func (c *Clock) HourHand() Point {
+	return angleToUnitPoint(hoursInRadians(c.Time))
+}
+
+func secondsInRadians(t time.Time) (rads float64) {
 	const oneSecondInRads = math.Pi / 30
-	return float64(seconds) * oneSecondInRads
+	return float64(t.Second()) * oneSecondInRads
 }
 
-func minutesInRadians(minutes int) (rads float64) {
-	return secondsInRadians(minutes)
+func minutesInRadians(t time.Time) (rads float64) {
+	const oneMinuteInRads = math.Pi / 30
+	var minutesPassed = oneMinuteInRads * float64(t.Minute())
+	return (secondsInRadians(t) / 60) + minutesPassed
+}
+
+func hoursInRadians(t time.Time) (rads float64) {
+	const oneHourInRads = math.Pi / 6
+	var hoursPassed = float64(t.Hour()%12) * oneHourInRads
+	return hoursPassed + (minutesInRadians(t) / 60)
 }
 
 func angleToUnitPoint(angle float64) Point {

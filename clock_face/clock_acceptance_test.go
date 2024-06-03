@@ -138,10 +138,6 @@ func TestSVGWriterHourHand(t *testing.T) {
 	}
 }
 
-func timeToTestName(time time.Time) string {
-	return time.Format("11:11:11")
-}
-
 func containsLine(l Line, lines []Line) bool {
 	for _, line := range lines {
 		if line == l {
