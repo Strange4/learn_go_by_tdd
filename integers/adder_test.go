@@ -2,20 +2,14 @@ package integers
 
 import (
 	"fmt"
+	"hello/assertions"
 	"testing"
 )
 
 func TestAdder(t *testing.T) {
 	sum := Add(123, 321)
 	expected := 444
-	assertInteger(t, sum, expected)
-}
-
-func assertInteger(t *testing.T, actual int, expected int) {
-	t.Helper()
-	if actual != expected {
-		t.Errorf("Got %v, want %v", actual, expected)
-	}
+	assertions.AssertInteger(t, sum, expected)
 }
 
 func ExampleAdd() {
