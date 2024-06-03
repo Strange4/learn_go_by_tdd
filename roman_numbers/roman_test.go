@@ -47,9 +47,7 @@ func TestDecToRoman(t *testing.T) {
 		name := fmt.Sprintf("%d converts to %q", testCase.decimal, testCase.roman)
 		t.Run(name, func(t *testing.T) {
 			got, err := DecToRoman(testCase.decimal)
-			if err != nil {
-				t.Errorf("expected no error but got %v", err)
-			}
+			assertions.AssertNoError(t, err)
 			want := testCase.roman
 			assertions.AssertString(t, got, want)
 		})
@@ -61,9 +59,7 @@ func TestRomanToDec(t *testing.T) {
 		name := fmt.Sprintf("%q converts to %d", testCase.roman, testCase.decimal)
 		t.Run(name, func(t *testing.T) {
 			got, err := RomanToDec(testCase.roman)
-			if err != nil {
-				t.Errorf("expected no error but got %v", err)
-			}
+			assertions.AssertNoError(t, err)
 			want := testCase.decimal
 			assertions.AssertEqual(t, got, want)
 		})
