@@ -1,4 +1,4 @@
-package clock
+package clock_face
 
 import (
 	"math"
@@ -7,6 +7,10 @@ import (
 )
 
 func TestSecondHand(t *testing.T) {
+	center := Point{150, 150}
+	radius := 150.0
+	secondHandLength := radius * 0.6
+
 	cases := []struct {
 		name  string
 		time  time.Time
@@ -14,18 +18,18 @@ func TestSecondHand(t *testing.T) {
 	}{
 		{
 			"0 seconds",
-			time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-			Point{X: Center.X, Y: Center.Y - SecondHandLength},
+			simpleTime(0, 0, 0),
+			Point{X: center.X, Y: center.Y - secondHandLength},
 		},
 		{
 			"30 seconds",
-			time.Date(2000, time.January, 1, 0, 0, 30, 0, time.UTC),
-			Point{X: Center.X, Y: Center.Y + SecondHandLength},
+			simpleTime(0, 0, 30),
+			Point{X: center.X, Y: center.Y + secondHandLength},
 		},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time}
+			c := Clock{testCase.time, center, radius}
 			want := testCase.point
 			got := c.SecondHand()
 			if !pointsRoughlyEqual(want, got) {
@@ -43,4 +47,8 @@ func floatRoughlyEqual(a, b float64) bool {
 	const deviation = 1e-6
 
 	return math.Abs(a-b) <= deviation
+}
+
+func simpleTime(hours, minutes, seconds int) time.Time {
+	return time.Date(2000, time.January, 1, hours, minutes, seconds, 0, time.UTC)
 }
