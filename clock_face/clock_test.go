@@ -1,42 +1,39 @@
 package clock_face
 
 import (
+	"fmt"
 	"math"
 	"testing"
 	"time"
 )
 
-func TestSecondHand(t *testing.T) {
+var secondAndMinuteCases = []struct {
+	time  int // from 0 to 59 inclusive
+	point Point
+}{
+	{
+		0,
+		Point{X: 0, Y: 1},
+	},
+	{
+		15,
+		Point{X: 1, Y: 0},
+	},
+	{
+		30,
+		Point{X: 0, Y: -1},
+	},
+	{
+		45,
+		Point{X: -1, Y: 0},
+	},
+}
 
-	cases := []struct {
-		name  string
-		time  time.Time
-		point Point
-	}{
-		{
-			"0 seconds",
-			simpleTime(0, 0, 0),
-			Point{X: 0, Y: 1},
-		},
-		{
-			"15 seconds",
-			simpleTime(0, 0, 15),
-			Point{X: 1, Y: 0},
-		},
-		{
-			"30 seconds",
-			simpleTime(0, 0, 30),
-			Point{X: 0, Y: -1},
-		},
-		{
-			"45 seconds",
-			simpleTime(0, 0, 45),
-			Point{X: -1, Y: 0},
-		},
-	}
-	for _, testCase := range cases {
-		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time}
+func TestSecondHand(t *testing.T) {
+	for _, testCase := range secondAndMinuteCases {
+		name := fmt.Sprintf("at %d seconds", testCase.time)
+		t.Run(name, func(t *testing.T) {
+			c := Clock{simpleTime(0, 0, testCase.time)}
 			want := testCase.point
 			got := c.SecondHand()
 			if !pointsRoughlyEqual(want, got) {
@@ -47,36 +44,10 @@ func TestSecondHand(t *testing.T) {
 }
 
 func TestMinuteHand(t *testing.T) {
-
-	cases := []struct {
-		name  string
-		time  time.Time
-		point Point
-	}{
-		{
-			"0 minutes",
-			simpleTime(0, 0, 0),
-			Point{X: 0, Y: 1},
-		},
-		{
-			"15 minutes",
-			simpleTime(0, 15, 0),
-			Point{X: 1, Y: 0},
-		},
-		{
-			"30 minutes",
-			simpleTime(0, 30, 0),
-			Point{X: 0, Y: -1},
-		},
-		{
-			"45 minutes",
-			simpleTime(0, 45, 0),
-			Point{X: -1, Y: 0},
-		},
-	}
-	for _, testCase := range cases {
-		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time}
+	for _, testCase := range secondAndMinuteCases {
+		name := fmt.Sprintf("at %d minutes", testCase.time)
+		t.Run(name, func(t *testing.T) {
+			c := Clock{simpleTime(0, testCase.time, 0)}
 			want := testCase.point
 			got := c.MinuteHand()
 			if !pointsRoughlyEqual(want, got) {
