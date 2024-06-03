@@ -1,12 +1,14 @@
 package main
 
 import (
-	"hello/mocking"
+	"hello/clock_face"
 	"os"
 	"time"
 )
 
 func main() {
-	sleeper := mocking.ConfigurableSleeper{Duration: 1 * time.Second, SleepFunc: time.Sleep}
-	mocking.Countdown(os.Stdout, &sleeper)
+	clock := clock_face.Clock{Time: time.Now()}
+	center := clock_face.Point{X: 150, Y: 150}
+	radius := 100.0
+	clock_face.SVGWriter(os.Stdout, &clock, center, radius)
 }

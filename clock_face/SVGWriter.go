@@ -1,6 +1,7 @@
 package clock_face
 
 import (
+	_ "embed"
 	"io"
 	"text/template"
 )
@@ -15,18 +16,24 @@ type svgClockData struct {
 	Height     float64
 }
 
-const templateFile = "./clock.tmpl"
+//go:embed clock.tmpl
+var svgTemplate string
+var tmpl = makeTemplate()
 
 func SVGWriter(writer io.Writer, clock *Clock, center Point, radius float64) {
-	tmpl, err := template.ParseFiles(templateFile)
-	if err != nil {
-		panic(err)
-	}
 	data := makeSVGData(clock, center, radius)
-	err = tmpl.Execute(writer, data)
+	err := tmpl.Execute(writer, data)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func makeTemplate() *template.Template {
+	tmpl, err := template.New("svgClock").Parse(svgTemplate)
+	if err != nil {
+		panic(err)
+	}
+	return tmpl
 }
 
 func makeSVGData(clock *Clock, center Point, radius float64) svgClockData {
@@ -39,6 +46,9 @@ func makeSVGData(clock *Clock, center Point, radius float64) svgClockData {
 		SecondHand: unitPointToHandPoint(secondHandLength, clock.SecondHand(), center),
 		MinuteHand: unitPointToHandPoint(minuteHandLength, clock.MinuteHand(), center),
 		HourHand:   unitPointToHandPoint(hourHandLength, clock.HourHand(), center),
+		Radius:     radius,
+		Width:      center.X * 2,
+		Height:     center.Y * 2,
 	}
 }
 
