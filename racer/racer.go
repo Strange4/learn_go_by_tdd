@@ -6,16 +6,17 @@ import (
 )
 
 func Race(link1, link2 string) string {
-	start1 := time.Now()
-	http.Get(link1)
-	link1Time := time.Since(start1)
-
-	start2 := time.Now()
-	http.Get(link2)
-	link2Time := time.Since(start2)
+	link1Time := measureHttpResponseTime(link1)
+	link2Time := measureHttpResponseTime(link2)
 
 	if link1Time < link2Time {
 		return link1
 	}
 	return link2
+}
+
+func measureHttpResponseTime(url string) time.Duration {
+	start := time.Now()
+	http.Get(url)
+	return time.Since(start)
 }

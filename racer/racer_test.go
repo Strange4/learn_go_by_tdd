@@ -8,14 +8,11 @@ import (
 )
 
 func TestRacer(t *testing.T) {
-	fastServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+	fastServer := makeServerWithDelay(0 * time.Millisecond)
+	slowServer := makeServerWithDelay(50 * time.Millisecond)
+	defer fastServer.Close()
+	defer slowServer.Close()
 
-	slowServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(50 * time.Millisecond)
-		w.WriteHeader(http.StatusOK)
-	}))
 	slow := slowServer.URL
 	fast := fastServer.URL
 
@@ -24,7 +21,11 @@ func TestRacer(t *testing.T) {
 	if want != got {
 		t.Errorf("Wanted %q but got %q", want, got)
 	}
+}
 
-	fastServer.Close()
-	slowServer.Close()
+func makeServerWithDelay(duration time.Duration) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(duration)
+		w.WriteHeader(http.StatusOK)
+	}))
 }
