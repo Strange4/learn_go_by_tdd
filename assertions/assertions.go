@@ -1,6 +1,9 @@
 package assertions
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func AssertString(t *testing.T, got string, want string) {
 	t.Helper()
@@ -9,9 +12,16 @@ func AssertString(t *testing.T, got string, want string) {
 	}
 }
 
-func AssertInteger(t *testing.T, actual int, expected int) {
+func AssertInteger(t *testing.T, got int, want int) {
 	t.Helper()
-	if actual != expected {
-		t.Errorf("Got %v, want %v", actual, expected)
+	if got != want {
+		t.Errorf("Got %d, want %d", got, want)
+	}
+}
+
+func AssertEqual(t *testing.T, got, want any) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Got %v, want %v", got, want)
 	}
 }

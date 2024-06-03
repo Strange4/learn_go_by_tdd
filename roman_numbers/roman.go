@@ -1,9 +1,12 @@
 package roman
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 type RomanNumeral struct {
-	Value  int
+	Value  uint16
 	Symbol string
 }
 
@@ -24,23 +27,39 @@ var allRomanNumerals = []RomanNumeral{
 	{1, "I"},
 }
 
-func DecToRoman(number int) string {
+var ErrValueTooLarge = errors.New("the value trying to be represented is too large")
+
+const RomanMaxNumber = 3999
+
+func DecToRoman(number uint16) (string, error) {
 	var result string
+	if number > RomanMaxNumber {
+		return "", ErrValueTooLarge
+	}
 	for _, roman := range allRomanNumerals {
 		for number >= roman.Value {
 			result += roman.Symbol
 			number -= roman.Value
 		}
 	}
-	return result
+	return result, nil
 }
 
-func RomanToDec(roman string) (result int) {
+var ErrTooManyRepetions = errors.New("the roman numeral has more than 3 repeated values")
+
+func RomanToDec(roman string) (uint16, error) {
+	var result uint16
+
 	for _, translation := range allRomanNumerals {
+		var repetitionCount uint8
 		for strings.HasPrefix(roman, translation.Symbol) {
+			if repetitionCount == 3 {
+				return 0, ErrTooManyRepetions
+			}
 			result += translation.Value
 			roman = strings.TrimPrefix(roman, translation.Symbol)
+			repetitionCount++
 		}
 	}
-	return
+	return result, nil
 }

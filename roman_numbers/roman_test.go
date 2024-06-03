@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"hello/assertions"
 	"testing"
+	"testing/quick"
 )
 
 var testCases = []struct {
-	decimal int
+	decimal uint16
 	roman   string
 }{
 	{1, "I"},
@@ -45,7 +46,10 @@ func TestDecToRoman(t *testing.T) {
 	for _, testCase := range testCases {
 		name := fmt.Sprintf("%d converts to %q", testCase.decimal, testCase.roman)
 		t.Run(name, func(t *testing.T) {
-			got := DecToRoman(testCase.decimal)
+			got, err := DecToRoman(testCase.decimal)
+			if err != nil {
+				t.Errorf("expected no error but got %v", err)
+			}
 			want := testCase.roman
 			assertions.AssertString(t, got, want)
 		})
@@ -56,9 +60,35 @@ func TestRomanToDec(t *testing.T) {
 	for _, testCase := range testCases {
 		name := fmt.Sprintf("%q converts to %d", testCase.roman, testCase.decimal)
 		t.Run(name, func(t *testing.T) {
-			got := RomanToDec(testCase.roman)
+			got, err := RomanToDec(testCase.roman)
+			if err != nil {
+				t.Errorf("expected no error but got %v", err)
+			}
 			want := testCase.decimal
-			assertions.AssertInteger(t, got, want)
+			assertions.AssertEqual(t, got, want)
 		})
+	}
+}
+
+func TestEncodingAndDecoding(t *testing.T) {
+
+	assertToAndFromRoman := func(number uint16) bool {
+		roman, err := DecToRoman(number)
+		if err != nil {
+			if number > RomanMaxNumber {
+				// expected error
+				return true
+			} else {
+				t.Errorf("expected no error but got %v", err)
+				return false
+			}
+		}
+
+		fromRoman, _ := RomanToDec(roman)
+		return number == fromRoman
+	}
+
+	if err := quick.Check(assertToAndFromRoman, nil); err != nil {
+		t.Errorf("failed the test with error: %v", err)
 	}
 }
