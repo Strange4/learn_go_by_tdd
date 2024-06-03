@@ -40,7 +40,7 @@ func minutesInRadians(t time.Time) (rads float64) {
 func hoursInRadians(t time.Time) (rads float64) {
 	const oneHourInRads = math.Pi / 6
 	var hoursPassed = float64(t.Hour()%12) * oneHourInRads
-	return hoursPassed + (minutesInRadians(t) / 60)
+	return hoursPassed + (minutesInRadians(t) / 12)
 }
 
 func angleToUnitPoint(angle float64) Point {

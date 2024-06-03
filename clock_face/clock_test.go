@@ -113,7 +113,7 @@ func TestHourHandUnitPoint(t *testing.T) {
 }
 
 func TestSecondHandInRadians(t *testing.T) {
-	const oneSecondInRads = math.Pi / 30
+	const oneSecondInRads = 2 * math.Pi / 60
 	cases := []struct {
 		time time.Time
 		rads float64
@@ -143,8 +143,8 @@ func TestSecondHandInRadians(t *testing.T) {
 }
 
 func TestMinuteHandInRadians(t *testing.T) {
-	const secondToMinuteRads = math.Pi / (30 * 60)
-	const minuteInRads = math.Pi / 30
+	const secondInFluenceInRads = 2 * math.Pi / (60 * 60)
+	const minuteInRads = 2 * math.Pi / 60
 	cases := []struct {
 		time time.Time
 		rads float64
@@ -155,17 +155,61 @@ func TestMinuteHandInRadians(t *testing.T) {
 		},
 		{
 			simpleTime(0, 0, 20),
-			secondToMinuteRads * 20,
+			secondInFluenceInRads * 20,
 		},
 		{
 			simpleTime(0, 1, 20),
-			(secondToMinuteRads * 20) + minuteInRads,
+			(secondInFluenceInRads * 20) + minuteInRads,
 		},
 	}
 	for _, testCase := range cases {
 		t.Run(timeToTestName(testCase.time), func(t *testing.T) {
 			want := testCase.rads
 			got := minutesInRadians(testCase.time)
+			if !floatRoughlyEqual(want, got) {
+				t.Errorf("Wanted angle %v but got %v", want, got)
+			}
+		})
+	}
+}
+
+func TestHourHandInRadians(t *testing.T) {
+	const secondInfluenceInRads = 2 * math.Pi / (60 * 60 * 12)
+	const minuteInfluenceRads = 2 * math.Pi / (60 * 12)
+	const hourInRads = 2 * math.Pi / 12
+	cases := []struct {
+		time time.Time
+		rads float64
+	}{
+		{
+			simpleTime(0, 0, 0),
+			0,
+		},
+		{
+			simpleTime(6, 0, 0),
+			hourInRads * 6,
+		},
+		{
+			simpleTime(9, 0, 0),
+			hourInRads * 9,
+		},
+		{
+			simpleTime(1, 17, 0),
+			(minuteInfluenceRads * 17) + hourInRads,
+		},
+		{
+			simpleTime(1, 23, 15),
+			hourInRads + (23 * minuteInfluenceRads) + (15 * secondInfluenceInRads),
+		},
+		{
+			simpleTime(0, 1, 30),
+			math.Pi / ((6 * 60 * 60) / 90),
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(timeToTestName(testCase.time), func(t *testing.T) {
+			want := testCase.rads
+			got := hoursInRadians(testCase.time)
 			if !floatRoughlyEqual(want, got) {
 				t.Errorf("Wanted angle %v but got %v", want, got)
 			}
