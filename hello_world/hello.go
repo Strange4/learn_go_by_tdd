@@ -28,3 +28,7 @@ func greetingPrefixSelector(language string) (prefix string) {
 	}
 	return
 }
+
+func main() {
+	fmt.Print(Hello("John", ""))
+}

@@ -30,6 +30,6 @@ func TestHello(t *testing.T) {
 func assertString(t *testing.T, got string, want string) {
 	t.Helper()
 	if got != want {
-		t.Errorf("Hello() = %q, want %q", got, want)
+		t.Errorf("Got %q, want %q", got, want)
 	}
 }
