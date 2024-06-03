@@ -6,22 +6,42 @@ import (
 )
 
 func SVGWriter(writer io.Writer, clock *Clock, center Point, radius float64) {
-	secondHandLength := radius * 0.6
-	minuteHandLength := radius * 0.5
-	secondHand := unitPointToHandPoint(secondHandLength, clock.SecondHand(), center)
-	minuteHand := unitPointToHandPoint(minuteHandLength, clock.MinuteHand(), center)
 	writer.Write([]byte(svgStart))
+	writeSecondHand(writer, clock, center, radius)
+	writeMinuteHand(writer, clock, center, radius)
+	writeHourHand(writer, clock, center, radius)
+	writer.Write([]byte(svgEnd))
+}
+
+func writeSecondHand(writer io.Writer, clock *Clock, center Point, radius float64) {
+	secondHandLength := radius * 0.6
+	secondHand := unitPointToHandPoint(secondHandLength, clock.SecondHand(), center)
+
 	fmt.Fprintf(writer, `
 	<!-- second hand -->
 	<line id="second_hand" x1="%.3f" y1="%.3f" x2="%.3f" y2="%.3f"
 		  style="fill:none;stroke:#f00;stroke-width:3px;"/>
 		  `, center.X, center.Y, secondHand.X, secondHand.Y)
+}
 
+func writeMinuteHand(writer io.Writer, clock *Clock, center Point, radius float64) {
+	minuteHandLength := radius * 0.5
+	minuteHand := unitPointToHandPoint(minuteHandLength, clock.MinuteHand(), center)
 	fmt.Fprintf(writer, `
 	<!-- minute hand -->
 	<line id="minute_hand" x1="%.3f" y1="%.3f" x2="%.3f" y2="%.3f"
-		style="fill:none;stroke:#000;stroke-width:7px;"/>`, center.X, center.Y, minuteHand.X, minuteHand.Y)
-	writer.Write([]byte(svgEnd))
+		style="fill:none;stroke:#000;stroke-width:7px;"/>
+	`, center.X, center.Y, minuteHand.X, minuteHand.Y)
+}
+
+func writeHourHand(writer io.Writer, clock *Clock, center Point, radius float64) {
+	hourHandLength := radius * 0.3
+	hourHand := unitPointToHandPoint(hourHandLength, clock.HourHand(), center)
+	fmt.Fprintf(writer, `
+	<!-- hour hand -->
+	<line id="hour_hand" x1="%.3f" y1="%.3f" x2="%.3f" y2="%.3f"
+		style="fill:none;stroke:#000;stroke-width:7px;"/>
+	`, center.X, center.Y, hourHand.X, hourHand.Y)
 }
 
 func unitPointToHandPoint(handLength float64, unitPoint, center Point) Point {
@@ -41,10 +61,6 @@ const svgStart = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 	<!-- bezel -->
 	<circle id="bezel" cx="150" cy="150" r="100" style="fill:#fff;stroke:#000;stroke-width:5px;"/>
-
-	<!-- hour hand -->
-	<line id="hour_hand" x1="150" y1="150" x2="114.150000" y2="132.260000"
-		style="fill:none;stroke:#000;stroke-width:7px;"/>
 `
 
 const svgEnd = `</svg>`
