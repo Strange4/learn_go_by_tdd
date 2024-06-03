@@ -11,30 +11,18 @@ type Point struct {
 }
 
 type Clock struct {
-	Time   time.Time
-	Center Point
-	Radius float64
+	Time time.Time
 }
 
 func (c *Clock) SecondHand() Point {
-	secondHandLength := c.Radius * 0.6
-	point := angleToUnitPoint(secondsInRadians(c.Time.Second()))
-
-	return unitPointToHandPoint(secondHandLength, point, c.Center)
+	// secondHandLength := c.Radius * 0.6
+	return angleToUnitPoint(secondsInRadians(c.Time.Second()))
 }
 
 func (c *Clock) MinuteHand() Point {
-	minuteHandLength := c.Radius * 0.5
-	point := angleToUnitPoint(minutesInRadians(c.Time.Minute()))
+	// minuteHandLength := c.Radius * 0.5
+	return angleToUnitPoint(minutesInRadians(c.Time.Minute()))
 
-	return unitPointToHandPoint(minuteHandLength, point, c.Center)
-}
-
-func unitPointToHandPoint(handLength float64, unitPoint, center Point) Point {
-	x := handLength*unitPoint.X + center.X
-	y := -handLength*unitPoint.Y + center.Y
-
-	return Point{X: x, Y: y}
 }
 
 func secondsInRadians(seconds int) (rads float64) {
@@ -47,5 +35,5 @@ func minutesInRadians(minutes int) (rads float64) {
 }
 
 func angleToUnitPoint(angle float64) Point {
-	return Point{math.Sin(angle), math.Cos(angle)}
+	return Point{X: math.Sin(angle), Y: math.Cos(angle)}
 }

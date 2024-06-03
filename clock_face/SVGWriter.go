@@ -5,16 +5,30 @@ import (
 	"io"
 )
 
-func SVGWriter(writer io.Writer, clock *Clock) {
-	secondHand := clock.SecondHand()
-
+func SVGWriter(writer io.Writer, clock *Clock, center Point, radius float64) {
+	secondHandLength := radius * 0.6
+	minuteHandLength := radius * 0.5
+	secondHand := unitPointToHandPoint(secondHandLength, clock.SecondHand(), center)
+	minuteHand := unitPointToHandPoint(minuteHandLength, clock.MinuteHand(), center)
 	writer.Write([]byte(svgStart))
 	fmt.Fprintf(writer, `
 	<!-- second hand -->
-	<line id="second_hand" x1="150" y1="150" x2="%.3f" y2="%.3f"
+	<line id="second_hand" x1="%.3f" y1="%.3f" x2="%.3f" y2="%.3f"
 		  style="fill:none;stroke:#f00;stroke-width:3px;"/>
-		  `, secondHand.X, secondHand.Y)
+		  `, center.X, center.Y, secondHand.X, secondHand.Y)
+
+	fmt.Fprintf(writer, `
+	<!-- minute hand -->
+	<line id="minute_hand" x1="%.3f" y1="%.3f" x2="%.3f" y2="%.3f"
+		style="fill:none;stroke:#000;stroke-width:7px;"/>`, center.X, center.Y, minuteHand.X, minuteHand.Y)
 	writer.Write([]byte(svgEnd))
+}
+
+func unitPointToHandPoint(handLength float64, unitPoint, center Point) Point {
+	x := handLength*unitPoint.X + center.X
+	y := -handLength*unitPoint.Y + center.Y
+
+	return Point{X: x, Y: y}
 }
 
 const svgStart = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -30,10 +44,6 @@ const svgStart = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 	<!-- hour hand -->
 	<line id="hour_hand" x1="150" y1="150" x2="114.150000" y2="132.260000"
-		style="fill:none;stroke:#000;stroke-width:7px;"/>
-
-	<!-- minute hand -->
-	<line id="minute_hand" x1="150" y1="150" x2="101.290000" y2="99.730000"
 		style="fill:none;stroke:#000;stroke-width:7px;"/>
 `
 

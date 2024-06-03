@@ -34,7 +34,12 @@ type Line struct {
 	Y2 float64 `xml:"y2,attr"`
 }
 
+var clockCenter = Point{150, 150}
+var clockRadius = 150.0
+
 func TestSVGWriterSecondHand(t *testing.T) {
+
+	secondHandLength := clockRadius * 0.6
 
 	cases := []struct {
 		name string
@@ -44,20 +49,55 @@ func TestSVGWriterSecondHand(t *testing.T) {
 		{
 			"0 seconds",
 			simpleTime(0, 0, 0),
-			Line{"second_hand", 150, 150, 150, 60},
+			Line{"second_hand", clockCenter.X, clockCenter.Y, clockCenter.X, clockCenter.Y - secondHandLength},
 		},
 		{
 			"30 seconds",
 			simpleTime(0, 0, 30),
-			Line{"second_hand", 150, 150, 150, 240},
+			Line{"second_hand", clockCenter.X, clockCenter.Y, clockCenter.X, clockCenter.Y + secondHandLength},
 		},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time, Point{150, 150}, 150}
+			c := Clock{testCase.time}
 			buffer := bytes.Buffer{}
 			want := testCase.line
-			SVGWriter(&buffer, &c)
+			SVGWriter(&buffer, &c, clockCenter, clockRadius)
+			svg := SVG{}
+			xml.Unmarshal(buffer.Bytes(), &svg)
+			if !containsLine(want, svg.Line) {
+				t.Errorf("Expected the line %v to be present in the svg but was not. Lines: %v", want, svg.Line)
+			}
+		})
+	}
+}
+
+func TestSVGWriterMinuteHand(t *testing.T) {
+
+	minuteHandLength := clockRadius * 0.5
+
+	cases := []struct {
+		name string
+		time time.Time
+		line Line
+	}{
+		{
+			"0 seconds",
+			simpleTime(0, 0, 0),
+			Line{"minute_hand", clockCenter.X, clockCenter.Y, clockCenter.X, clockCenter.Y - minuteHandLength},
+		},
+		{
+			"30 seconds",
+			simpleTime(0, 30, 0),
+			Line{"minute_hand", clockCenter.X, clockCenter.Y, clockCenter.X, clockCenter.Y + minuteHandLength},
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := Clock{testCase.time}
+			buffer := bytes.Buffer{}
+			want := testCase.line
+			SVGWriter(&buffer, &c, clockCenter, clockRadius)
 			svg := SVG{}
 			xml.Unmarshal(buffer.Bytes(), &svg)
 			if !containsLine(want, svg.Line) {

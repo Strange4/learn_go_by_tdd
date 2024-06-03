@@ -7,9 +7,6 @@ import (
 )
 
 func TestSecondHand(t *testing.T) {
-	center := Point{150, 150}
-	radius := 150.0
-	secondHandLength := radius * 0.6
 
 	cases := []struct {
 		name  string
@@ -19,17 +16,27 @@ func TestSecondHand(t *testing.T) {
 		{
 			"0 seconds",
 			simpleTime(0, 0, 0),
-			Point{X: center.X, Y: center.Y - secondHandLength},
+			Point{X: 0, Y: 1},
+		},
+		{
+			"15 seconds",
+			simpleTime(0, 0, 15),
+			Point{X: 1, Y: 0},
 		},
 		{
 			"30 seconds",
 			simpleTime(0, 0, 30),
-			Point{X: center.X, Y: center.Y + secondHandLength},
+			Point{X: 0, Y: -1},
+		},
+		{
+			"45 seconds",
+			simpleTime(0, 0, 45),
+			Point{X: -1, Y: 0},
 		},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time, center, radius}
+			c := Clock{testCase.time}
 			want := testCase.point
 			got := c.SecondHand()
 			if !pointsRoughlyEqual(want, got) {
@@ -40,9 +47,6 @@ func TestSecondHand(t *testing.T) {
 }
 
 func TestMinuteHand(t *testing.T) {
-	center := Point{150, 150}
-	radius := 150.0
-	minuteHandLength := radius * 0.5
 
 	cases := []struct {
 		name  string
@@ -52,27 +56,27 @@ func TestMinuteHand(t *testing.T) {
 		{
 			"0 minutes",
 			simpleTime(0, 0, 0),
-			Point{X: center.X, Y: center.Y - minuteHandLength},
+			Point{X: 0, Y: 1},
 		},
 		{
 			"15 minutes",
 			simpleTime(0, 15, 0),
-			Point{X: center.X + minuteHandLength, Y: center.Y},
+			Point{X: 1, Y: 0},
 		},
 		{
 			"30 minutes",
 			simpleTime(0, 30, 0),
-			Point{X: center.X, Y: center.Y + minuteHandLength},
+			Point{X: 0, Y: -1},
 		},
 		{
 			"45 minutes",
 			simpleTime(0, 45, 0),
-			Point{X: center.X - minuteHandLength, Y: center.Y},
+			Point{X: -1, Y: 0},
 		},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			c := Clock{testCase.time, center, radius}
+			c := Clock{testCase.time}
 			want := testCase.point
 			got := c.MinuteHand()
 			if !pointsRoughlyEqual(want, got) {
