@@ -1,5 +1,7 @@
 package roman
 
+import "strings"
+
 type RomanNumeral struct {
 	Value  int
 	Symbol string
@@ -33,6 +35,12 @@ func DecToRoman(number int) string {
 	return result
 }
 
-func RomanToDec(roman string) int {
-	return 0
+func RomanToDec(roman string) (result int) {
+	for _, translation := range allRomanNumerals {
+		for strings.HasPrefix(roman, translation.Symbol) {
+			result += translation.Value
+			roman = strings.TrimPrefix(roman, translation.Symbol)
+		}
+	}
+	return
 }
