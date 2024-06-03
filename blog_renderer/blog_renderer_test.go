@@ -4,8 +4,18 @@ import (
 	"bytes"
 	blogpost "hello/blog"
 	"hello/blog_renderer"
+	"strings"
 	"testing"
 )
+
+const wantedHTML = `<h1>How to make real time graphics renderer</h1>
+<p>this is not a real advice</p>
+Tags:
+<ul>
+    <li>gpu</li>
+    <li>shader</li>
+    <li>BRDF</li>
+</ul>`
 
 func TestRender(t *testing.T) {
 	post := blogpost.Post{
@@ -20,16 +30,9 @@ func TestRender(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := buf.String()
-	want := `<h1>How to make real time graphics renderer</h1>
-<p>this is not a real advice</p>
-Tags:
-<ul>
-	<li>gpu</li>
-	<li>shader</li>
-	<li>BRDF</li>
-</ul>`
+	got := strings.ReplaceAll(buf.String(), "\r", "")
+	want := wantedHTML
 	if want != got {
-		t.Errorf("wanted post '%s' but only got '%s'", want, got)
+		t.Errorf("wanted post '%q' but only got '%q'", want, got)
 	}
 }
